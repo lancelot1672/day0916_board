@@ -1,8 +1,12 @@
+<%@page import="org.apache.jasper.tagplugins.jstl.core.ForEach"%>
 <%@page import="model.BoardDTO"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.HashMap"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ page isELIgnored="false"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:set var="root" value="${pageContext.request.contextPath}"></c:set>
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,24 +22,31 @@ a {
 	text-decoration: none;
 	color: black;
 }
+
 .frame {
 	margin: 100px 400px;
 }
-.header-content > h2{
+
+.header-content>h2 {
 	text-align: center;
 }
+
 .main-content {
 	margin-top: 50px;
 }
+
 .page-section {
 	text-align: center;
 }
+
 .btn-section {
 	text-align: right;
 }
+
 .page {
 	font-size: 20px;
 }
+
 .table {
 	text-align: center;
 }
@@ -50,7 +61,13 @@ a {
 	int endPage = (int) boardPage.get("endPage");
 	int totalPage = (int) boardPage.get("totalPage");
 
+	request.setAttribute("currPage", currPage);
+	request.setAttribute("startPage", startPage);
+	request.setAttribute("endPage", endPage);
+	request.setAttribute("totalPage", totalPage);
+
 	List<BoardDTO> boardList = (List<BoardDTO>) boardPage.get("boardList");
+	request.setAttribute("boardList", boardPage.get("boardList"));
 	%>
 	<div class="frame">
 		<div class="header-content">
@@ -69,56 +86,45 @@ a {
 					</tr>
 				</thead>
 				<tbody>
-					<%
-					if (boardPage == null || boardList == null || boardList.size() == 0) {
-					%>
-					<tr>
-						<td colspan="5">작성된 게시글이 없습니다. 게시글을 작성해보세요.</td>
-					</tr>
-
-					<%
-					} else {
-					for (BoardDTO b : boardList) {
-					%>
-					<tr>
-						<td><%=b.getBno()%></td>
-						<td><a
-							href="<%=request.getContextPath()%>/board?action=search&bno=<%=b.getBno()%>"><%=b.getTitle()%></a></td>
-						<td><%=b.getWriter()%></td>
-						<td><%=b.getWrite_date()%></td>
-						<td><%=b.getRead_count()%></td>
-					</tr>
-					<%
-					}
-					}
-					%>
+					<c:choose>
+						<c:when
+							test="${boardPage == null || boardList == null || boardList.size() == 0}">
+							<tr>
+								<td colspan="5">작성된 게시글이 없습니다. 게시글을 작성해보세요.</td>
+							</tr>
+						</c:when>
+						<c:otherwise>
+							<c:forEach var="boardDTO" items="${boardList}">
+								<tr>
+									<td>${boardDTO.bno}</td>
+									<td><a
+										href="${root}/board?action=search&bno=${boardDTO.bno}">${boardDTO.title}</a></td>
+									<td>${boardDTO.writer}</td>
+									<td>${boardDTO.write_date}</td>
+									<td>${boardDTO.read_count}</td>
+								</tr>
+							</c:forEach>
+						</c:otherwise>
+					</c:choose>
 				</tbody>
 			</table>
 			<div class="page-section">
-				<%
-				if (startPage > 1) {
-				%>
-				<a class="page"
-					href="<%=request.getContextPath()%>/board?action=list&page=<%=startPage - 1%>">[이전]</a>
-				<%
-				}
-				%>
-				<%
-					for (int p = startPage; p <= endPage; p++) {
-				%>
-				<a class="page" href="<%=request.getContextPath()%>/board?action=list&page=<%=p%>">[<%=p%>]
-				</a>
-				<%
-					}
-				%>
-				<%
-				if (endPage < totalPage) {
-				%>
-				<a class="page" 
-					href="<%=request.getContextPath()%>/board?action=list&page=<%=endPage + 1%>">[다음]</a>
-				<%
-				}
-				%>
+				<c:choose>
+					<c:when test="${startPage > 1}">
+						<a class="page"
+							href="${root}/board?action=list&page=${startPage - 1}">[이전]</a>
+					</c:when>
+				</c:choose>
+				<c:forEach var="i" begin="${startPage}" end="${endPage}">
+					<a class="page" href="${root}/board?action=list&page=${i}">[${i}]
+					</a>
+				</c:forEach>
+				<c:choose>
+					<c:when test="${endPage < totalPage}">
+						<a class="page"
+							href="${root}/board?action=list&page=${endPage + 1}">[다음]</a>
+					</c:when>
+				</c:choose>
 			</div>
 			<div class="btn-section">
 				<button class="btn btn-secondary" id="btnWrite">글쓰기</button>
@@ -130,7 +136,8 @@ a {
 </body>
 <script>
 	document.querySelector("#btnWrite").addEventListener('click',function(){
-		location.href = "<%=request.getContextPath()%>/board?action=write";
+		location.href = "<%=request.getContextPath()%>
+	/board?action=write";
 	});
 </script>
 </html>

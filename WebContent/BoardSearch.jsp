@@ -1,14 +1,18 @@
 <%@page import="model.BoardDTO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ page isELIgnored="false"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:set var="root" value="${pageContext.request.contextPath}"></c:set>
 <%
 BoardDTO board = (BoardDTO) request.getAttribute("board");
+request.setAttribute("board", board);
 %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title><%=board.getTitle()%></title>
+<title>${board.title}</title>
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
 	rel="stylesheet"
@@ -58,23 +62,23 @@ a {
 					<tr>
 						<td>제목:</td>
 						<td><input type="text" class="form-control" name="title"
-							id="title" value="<%=board.getTitle()%>" disabled="disabled"></td>
+							id="title" value="${board.title}" disabled="disabled"></td>
 					</tr>
 					<tr>
 						<td>내용:</td>
 						<td><textarea class="form-control" rows="20" name="content"
 								id="content" style="text-align: left;">
-							<%=board.getContent() %>	
+							${board.content}	
 							</textarea>
 						</td>
 					</tr>
 					<tr>
 						<td>작성자:</td>
-						<td><%=board.getWriter()%></td>
+						<td>${board.writer}</td>
 					</tr>
 					<tr>
 						<td>작성일:</td>
-						<td><%=board.getWrite_date()%></td>
+						<td>${board.write_date }</td>
 					</tr>
 				</table>
 				<div class="btn-section">
